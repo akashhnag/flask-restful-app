@@ -19,7 +19,7 @@ class User():
 
     def get_all_users():
         print('get all users')
-        connection=sqlite3.connect('data.db')
+        connection=sqlite3.connect('users.db')
         cursor=connection.cursor()
 
         user='SELECT * FROM users'
@@ -30,15 +30,34 @@ class User():
 
         connection.close()
 
-    def add_users():
-        print('add users')
-        # connection=sqlite3.connect('data.db')
-        # cursor=connection.cursor()
+    def add_user(data):
+        print('adding user in db',data)
+        connection=sqlite3.connect('users.db')
+        cursor=connection.cursor()
 
-        # user='SELECT * FROM users'
-        # result=[]
-        # for row in cursor.execute(user):
-        #     result.append(row)
-        # return result
+        show_user='SELECT * FROM users WHERE username=?'
+        execute_query=cursor.execute(show_user,(data['username'],))
+        result=execute_query.fetchone()
+        if result:
+            print(result)
+            return result
+        else:
+            print('no result')
+            insert_user='INSERT INTO users VALUES(NULL,?,?)'
+            cursor.execute(insert_user,(data['username'],data['password'],))
+            return 'done'
 
-        # connection.close()
+        connection.commit()
+        connection.close()
+
+    def authenticate(data):
+        print('add users',data)
+        connection=sqlite3.connect('data.db')
+        cursor=connection.cursor()
+        username=data['username']
+        password=data['password']
+        user='SELECT * FROM users WHERE username=? AND password=?'
+        value=cursor.execute(user,(username,password,))
+        result=value.fetchone()
+        return result
+        connection.close()

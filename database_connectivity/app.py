@@ -6,8 +6,6 @@ app=Flask(__name__)
 api=Api(app)
 
 class Users(Resource):
-
-
     def get(self,name):
         print(name)
         user=User.get_user_by_username(name)
@@ -39,11 +37,26 @@ class GetAllUsers(Resource):
 
     def post(self):
         data=GetAllUsers.parser.parse_args()
-        print(data)
-        User.add_users()
+        result=User.add_user(data)
+        if result=='done':
+            return({'message':'User registered'},201)
+        else:
+            return({'error':'User already present'})
+
+class Authenticate(Resource):
+    def post(self):
+        data=GetAllUsers.parser.parse_args()
+        result=User.authenticate(data)
+        if result:
+            print(result)
+            return(jsonify(result))
+        else:
+            print('User not present')
+            return({'error':'Username or password incorrect'},404)
 
 api.add_resource(Users,'/users/<string:name>')
 api.add_resource(GetAllUsers,'/users')
+api.add_resource(Authenticate,'/authenticate')
 
 
 app.run(port=3000,debug=True)
